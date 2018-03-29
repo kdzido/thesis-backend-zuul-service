@@ -3,10 +3,8 @@ server.port: 5555
 # TODO remove
 management.security.enabled: false
 
-# standalone mode
 eureka:
   instance:
-#    hostname: localhost
     preferIpAddress: true
   client:
     registerWithEureka: true
