@@ -1,0 +1,23 @@
+server.port: 5555
+
+# TODO remove
+management.security.enabled: false
+
+# standalone mode
+eureka:
+  instance:
+#    hostname: localhost
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+  server:
+    waitTimeInMsWhenSyncEmpty: 0
+  serviceUrl:
+    defaultZone: http://localhost:8761/eureka/
+
+# logging
+logging.level:
+  com.netflix: WARN
+  org.springframework.web: WARN
+  com.kdzido.thesis.zuul: DEBUG

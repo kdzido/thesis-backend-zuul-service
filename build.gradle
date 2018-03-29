@@ -1,0 +1,13 @@
+
+allprojects {
+    ext {
+        groovyVersion = '2.4.13'
+        cucumberVersion = '2.0.1'
+        groovyVersion = '2.4.7'
+        junitVersion = '4.12'
+        spockVersion = '1.1-groovy-2.4'
+        cglibVersion = '2.2'
+//        springBootVersion = '1.5.10.RELEASE'
+    }
+
+}

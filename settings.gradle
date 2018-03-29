@@ -1,0 +1,4 @@
+rootProject.name = 'thesis-backend-zuul-service'
+
+include 'backend-zuul-service'
+
