@@ -52,8 +52,7 @@ public class TracingPreFilter extends ZuulFilter {
         }
 
         final RequestContext ctx = RequestContext.getCurrentContext();
-
-        logger.debug(String.format("Processing incoming request for {}.",  ctx.getRequest().getRequestURI()));
+        logger.debug("Processing incoming request for {}.",  ctx.getRequest().getRequestURI());
 
         return null;
     }

@@ -85,14 +85,14 @@ task copyDockerFiles(dependsOn: [copyJars], type: Copy) {
     filter(ReplaceTokens, tokens: [springBootJar: springBootJar])
 }
 
-docker {
-    registryCredentials {
-//        url = 'https://index.docker.io/v1/'
-        username = System.env.DOCKERHUB_CREDS_USR
-        password = System.env.DOCKERHUB_CREDS_PSW
-        email = "xtofek@gmail.com"
-    }
-}
+//docker {
+//    registryCredentials {
+////        url = 'https://index.docker.io/v1/'
+//        username = System.env.DOCKERHUB_CREDS_USR
+//        password = System.env.DOCKERHUB_CREDS_PSW
+//        email = "xtofek@gmail.com"
+//    }
+//}
 
 // TODO use DockerApplication with Boot
 task buildDockerImage(type: DockerBuildImage) {
