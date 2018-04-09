@@ -8,3 +8,6 @@ spring:
     config:
       enabled: true
       uri: http://localhost:8888
+
+# TODO remove
+management.security.enabled: false
