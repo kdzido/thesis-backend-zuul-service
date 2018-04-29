@@ -32,7 +32,40 @@ pipeline {
                 }
             }
         }
-
+        stage("Publish") { // Local Docker registry
+            steps {
+                sh "docker tag thesis-zuulservice:snapshot localhost:5000/thesis-zuulservice"
+                sh "docker tag thesis-zuulservice:snapshot localhost:5000/thesis-zuulservice:${env.BUILD_NUMBER}"
+                sh "docker push localhost:5000/thesis-zuulservice"
+                sh "docker push localhost:5000/thesis-zuulservice:${env.BUILD_NUMBER}"
+            }
+        }
+        stage("Prod-like") {
+            steps {
+                withEnv([
+                        "DOCKER_TLS_VERIFY=1",
+                        "DOCKER_HOST=tcp://${env.PROD_LIKE_IP}:2376",
+                        "DOCKER_CERT_PATH=/machines/${env.PROD_LIKE_NAME}"]) {
+                    sh "docker service update --image localhost:5000/thesis-zuulservice:${env.BUILD_NUMBER} zuulservice"
+                }
+                // TODO smoke test or rollback!!
+                // TODO smoke test or rollback!!
+                // TODO smoke test or rollback!!
+            }
+        }
+        stage("Prod") {
+            steps {
+                withEnv([
+                        "DOCKER_TLS_VERIFY=1",
+                        "DOCKER_HOST=tcp://${env.PROD_IP}:2376",
+                        "DOCKER_CERT_PATH=/machines/${env.PROD_NAME}"]) {
+                    sh "docker service update --image localhost:5000/thesis-zuulservice:${env.BUILD_NUMBER} zuulservice"
+                }
+                // TODO smoke test or rollback!!
+                // TODO smoke test or rollback!!
+                // TODO smoke test or rollback!!
+            }
+        }
     }
 
     post {
