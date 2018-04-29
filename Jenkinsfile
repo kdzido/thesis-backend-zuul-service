@@ -25,6 +25,14 @@ pipeline {
                 }
             }
         }
+        stage('Staging') {
+            steps {
+                withEnv(["COMPOSE_FILE=docker-compose-test.yml"]) {
+                    sh 'docker-compose run --rm staging'
+                }
+            }
+        }
+
     }
 
     post {
