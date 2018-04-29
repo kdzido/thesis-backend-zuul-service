@@ -3,8 +3,8 @@ buildscript {
         springBootVersion = '1.5.10.RELEASE'
     }
     repositories {
+        mavenLocal()
         mavenCentral()
-//        maven { url 'http://artifactory:8071/artifactory/libs-release' }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -20,13 +20,12 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'com.bmuschko.docker-remote-api'
 
 import org.apache.tools.ant.filters.*
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group 'pl.pja.13868.news'
-version '0.3.0'
+version '0.4.0'
 
 repositories {
     mavenLocal()
@@ -41,31 +40,22 @@ dependencyManagement {
 }
 
 dependencies {
-    compile('org.springframework.cloud:spring-cloud-starter-config')
-    compile('org.springframework.cloud:spring-cloud-config-client')
-    compile('org.springframework.cloud:spring-cloud-starter-eureka')
-    compile('org.springframework.cloud:spring-cloud-starter-zuul')
+    compile 'org.springframework.cloud:spring-cloud-starter-config'
+    compile 'org.springframework.cloud:spring-cloud-config-client'
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka'
+    compile 'org.springframework.cloud:spring-cloud-starter-zuul'
 
     testCompile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    testCompile "org.codehaus.groovy.modules.http-builder:http-builder:${httpBuilderVersion}"
     testCompile "junit:junit:${junitVersion}"
     testCompile "org.spockframework:spock-core:${spockVersion}"
-    testCompile("cglib:cglib-nodep:${cglibVersion}")
+    testCompile "cglib:cglib-nodep:${cglibVersion}"
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
-//task createBuildInfoFile << {
-//    def buildInfo = new File("$buildDir/build-info.properties")
-//    def properties = new Properties()
-//    properties.setProperty("version", project.version.toString())
-////    properties.setProperty("timestamp", project.buildTimestamp) // TODO timestamp
-//    properties.store(buildInfo.newWriter(), null)
-//}
-
 jar {
-//    dependsOn createBuildInfoFile
     baseName = 'zuul-service'
-
     from(buildDir) {
         include 'build-info.properties'
         into('META-INF/')
@@ -85,23 +75,4 @@ task copyDockerFiles(dependsOn: [copyJars], type: Copy) {
     filter(ReplaceTokens, tokens: [springBootJar: springBootJar])
 }
 
-//docker {
-//    registryCredentials {
-////        url = 'https://index.docker.io/v1/'
-//        username = System.env.DOCKERHUB_CREDS_USR
-//        password = System.env.DOCKERHUB_CREDS_PSW
-//        email = "xtofek@gmail.com"
-//    }
-//}
-
-// TODO use DockerApplication with Boot
-task buildDockerImage(type: DockerBuildImage) {
-    dependsOn copyDockerFiles
-    inputDir = project.file("$buildDir/dockerfile/Dockerfile").parentFile
-    // TODO include build-info.properties
-
-    String dockerTag = System.env.PIPELINE_BUILD_ID ?: "snapshot"
-    tag = "qu4rk/thesis-zuulservice:${dockerTag}"
-}
-
-// TODO publish to artifactory?
+// TODO publish to artifactory

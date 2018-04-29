@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+# Commit
+  unit:
+    image: openjdk:8u162-jdk
+    volumes:
+      - .:/appsrc
+      - ./rootGradle:/root/.gradle
+    working_dir: /appsrc
+    command: bash -c "./gradlew clean build copyDockerFiles"
+
+  app:
+    build:
+      context: ./backend-zuul-service/build/dockerfile/
+    image: thesis-zuulservice:snapshot

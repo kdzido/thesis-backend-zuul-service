@@ -1,11 +1,11 @@
+// Declarative Continuous Deployment Pipeline
+
 pipeline {
     agent {
-//        docker {
-//            image 'jenkins/ssh-slave'
-//            label 'docker-enabled'
-//            args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/jenkins_remote_root/.gradle/wrapper/dists:/root/.gradle/wrapper/dists -v $HOME/.m2:/root/.m2'
-//        }
         node { label 'docker-enabled' }
+    }
+    options {
+        timestamps()
     }
 
     environment {
@@ -16,42 +16,24 @@ pipeline {
     }
 
     stages {
-        stage('Commit Stage') {
+        stage('Unit') {
             steps {
-                sh './gradlew clean build buildDockerImage'
-                sh '''\
-                docker login -u $DOCKERHUB_CREDS_USR -p $DOCKERHUB_CREDS_PSW
-                docker push qu4rk/thesis-zuulservice:$PIPELINE_BUILD_ID
-                '''
+                withEnv(["COMPOSE_FILE=docker-compose-test.yml"]) {
+                    sh 'mkdir -p backend-zuul-service/build/dockerfile'   // dir must exist for docker-compose
+                    sh 'docker-compose run --rm unit'
+                    sh 'docker-compose build app'
+                }
             }
         }
-        stage('Acceptance Stage') {
-            steps {
-                echo 'TODO Acceptance Stage'
-            }
-        }
-        stage('Performance Stage') {
-            steps {
-                echo 'TODO Performance Stage'
-            }
-        }
-        stage('UAT Stage') {
-            steps {
-                echo 'TODO Acceptance Stage'
-            }
-        }
-        stage('Deploy to Production') {
-            steps {
-//                input "Proceed?"
-                echo 'TODO deploy to Production'
-            }
-        }
-
     }
 
-//    post {
-//        always {
-//             junit 'build/reports/**/*.xml'
-//        }
-//    }
+    post {
+        always {
+            // TODO handle non-existing backend-zuul-service/build/dockerfile
+            withEnv(["COMPOSE_FILE=docker-compose-test.yml"]) {
+                sh "docker-compose down"
+            }
+        }
+    }
+
 }
