@@ -9,7 +9,6 @@ allprojects {
         junitVersion = '4.12'
         spockVersion = '1.1-groovy-2.4'
         cglibVersion = '2.2'
-//        springBootVersion = '1.5.10.RELEASE'
     }
 
 }
