@@ -42,22 +42,22 @@ services:
     ports:
       - "7888:8888"
 
-  sampleservice:
-    image: thesis-sampleservice:snapshot # TODO fixed?
+  authservice:
+    image: thesis-authservice:snapshot  # TODO fixed?
     depends_on:
       - eurekapeer1
       - eurekapeer2
       - configservice
     environment:
       PROFILE: "default"
-      SERVER_PORT: "8090"
+      SERVER_PORT: "9999"
       CONFIGSERVICE_URI: "http://configservice:8888"
       CONFIGSERVICE_PORT: "8888"
       EUREKASERVICE_URI: "http://eurekapeer1:8761/eureka/,http://eurekapeer2:8761/eureka/"
       EUREKASERVICE_PORT: "8761"
       ENCRYPT_KEY: "COMMON_SYMMETRIC_KEY"
     ports:
-      - "7090:8090"
+      - "7999:9999"
 
   zuulservice:
     image: thesis-zuulservice:snapshot
@@ -76,14 +76,33 @@ services:
     ports:
       - "7555:5555"
 
+  sampleservice:
+    image: thesis-sampleservice:snapshot # TODO fixed?
+    depends_on:
+      - eurekapeer1
+      - eurekapeer2
+      - configservice
+    environment:
+      PROFILE: "default"
+      SERVER_PORT: "8090"
+      CONFIGSERVICE_URI: "http://configservice:8888"
+      CONFIGSERVICE_PORT: "8888"
+      EUREKASERVICE_URI: "http://eurekapeer1:8761/eureka/,http://eurekapeer2:8761/eureka/"
+      EUREKASERVICE_PORT: "8761"
+      OAUTH2_USERINFO_URI: "http://authservice:9999/auth/user"
+      ENCRYPT_KEY: "COMMON_SYMMETRIC_KEY"
+    ports:
+      - "7090:8090"
+
   staging:
     image: openjdk:8u162-jdk
     depends_on:
       - eurekapeer1
       - eurekapeer2
       - configservice
-      - sampleservice
+      - authservice
       - zuulservice
+      - sampleservice
     volumes:
       - .:/appsrc
       - ./rootGradle:/root/.gradle
@@ -92,8 +111,9 @@ services:
       - EUREKASERVICE_URI_2=http://eurekapeer2:8761
       - EUREKASERVICE_PORT=8761
       - CONFIGSERVICE_URI=http://configservice:8888
-      - SAMPLESERVICE_URI=http://sampleservice:8090
+      - AUTHSERVICE_URI=http://authservice:9999
       - ZUULSERVICE_URI=http://zuulservice:5555
+      - SAMPLESERVICE_URI=http://sampleservice:8090
       - ENCRYPT_KEY="COMMON_SYMMETRIC_KEY"
     working_dir: /appsrc
-    command: bash -c "ping -c 1 eurekapeer1 && ping -c 1 eurekapeer2 && ping -c 1 configservice && ping -c 1 sampleservice && ping -c 1 zuulservice && ./gradlew integTest"
+    command: bash -c "ping -c 1 eurekapeer1 && ping -c 1 eurekapeer2 && ping -c 1 configservice && ping -c 1 sampleservice && ping -c 1 authservice && ping -c 1 zuulservice && ./gradlew integTest"
