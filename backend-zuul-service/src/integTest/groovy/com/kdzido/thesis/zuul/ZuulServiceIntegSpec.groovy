@@ -30,7 +30,7 @@ class ZuulServiceIntegSpec extends Specification {
 
     def "that zuul discovered (from eureka) route to sampleservice"() {
         expect:
-        await().atMost(5, TimeUnit.MINUTES).until({
+        await().atMost(6, TimeUnit.MINUTES).until({
             try {
                 def resp = zuulServiceClient.get(path: "/routes")
 
@@ -53,7 +53,7 @@ class ZuulServiceIntegSpec extends Specification {
                 password: "readerpassword"]
 
         expect:
-        await().atMost(5, TimeUnit.MINUTES).until({
+        await().atMost(6, TimeUnit.MINUTES).until({
             try {
                 def authServerResp = authServiceClient.post(
                         path: "/auth/oauth/token",
@@ -86,7 +86,7 @@ class ZuulServiceIntegSpec extends Specification {
         authServiceClient.auth.basic("newsapp", "newsappsecret")
 
         expect:
-        await().atMost(5, TimeUnit.MINUTES).until({
+        await().atMost(6, TimeUnit.MINUTES).until({
             try {
                 def zuulServiceClient = new RESTClient("$ZUULSERVICE_URI").with {
                     setHeaders(Accept: MediaType.APPLICATION_JSON_VALUE,
