@@ -8,6 +8,8 @@ services:
       - .:/appsrc
       - ./rootGradle:/root/.gradle
     working_dir: /appsrc
+    environment:
+      - GRADLE_OPTS=-Xmx512m
     command: bash -c "./gradlew clean build copyDockerFiles --no-daemon"
 
   app:
@@ -115,5 +117,6 @@ services:
       - ZUULSERVICE_URI=http://zuulservice:5555
       - SAMPLESERVICE_URI=http://sampleservice:8090
       - ENCRYPT_KEY="COMMON_SYMMETRIC_KEY"
+      - GRADLE_OPTS=-Xmx512m
     working_dir: /appsrc
     command: bash -c "ping -c 1 eurekapeer1 && ping -c 1 eurekapeer2 && ping -c 1 configservice && ping -c 1 sampleservice && ping -c 1 authservice && ping -c 1 zuulservice && ./gradlew integTest --no-daemon"
