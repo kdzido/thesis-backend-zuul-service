@@ -1,15 +1,16 @@
-version: '3'
+version: '2'
 
 services:
 # Commit
   unit:
     image: openjdk:8u162-jdk
+    mem_limit: 1570m  # jvm allocates 1/4 to max heap size
     volumes:
       - .:/appsrc
       - ./rootGradle:/root/.gradle
     working_dir: /appsrc
     environment:
-      - GRADLE_OPTS=-Xmx512m
+      JAVA_OPTS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     command: bash -c "./gradlew clean build copyDockerFiles --no-daemon"
 
   app:
@@ -20,6 +21,7 @@ services:
 # Staging
   eurekapeer1:
     image: thesis-eurekaservice:snapshot  # TODO fixed?
+    mem_limit: 500m   # jvm allocates 1/4 to max heap size
     environment:
       - PROFILE=peer1
     ports:
@@ -27,6 +29,7 @@ services:
 
   eurekapeer2:
     image: thesis-eurekaservice:snapshot  # TODO fixed?
+    mem_limit: 500m   # jvm allocates 1/4 to max heap size
     environment:
       - PROFILE=peer2
     ports:
@@ -34,6 +37,7 @@ services:
 
   configservice:
     image: thesis-configservice:snapshot  # TODO fixed?
+    mem_limit: 500m   # jvm allocates 1/4 to max heap size
     depends_on:
       - eurekapeer1
       - eurekapeer2
@@ -46,6 +50,7 @@ services:
 
   authservice:
     image: thesis-authservice:snapshot  # TODO fixed?
+    mem_limit: 500m   # jvm allocates 1/4 to max heap size
     depends_on:
       - eurekapeer1
       - eurekapeer2
@@ -63,6 +68,7 @@ services:
 
   zuulservice:
     image: thesis-zuulservice:snapshot
+    mem_limit: 500m   # jvm allocates 1/4 to max heap size
     depends_on:
       - eurekapeer1
       - eurekapeer2
@@ -80,6 +86,7 @@ services:
 
   sampleservice:
     image: thesis-sampleservice:snapshot # TODO fixed?
+    mem_limit: 500m   # jvm allocates 1/4 to max heap size
     depends_on:
       - eurekapeer1
       - eurekapeer2
@@ -98,6 +105,7 @@ services:
 
   staging:
     image: openjdk:8u162-jdk
+    mem_limit: 1570m  # jvm allocates 1/4 to max heap size
     depends_on:
       - eurekapeer1
       - eurekapeer2
@@ -109,14 +117,14 @@ services:
       - .:/appsrc
       - ./rootGradle:/root/.gradle
     environment:
-      - EUREKASERVICE_URI_1=http://eurekapeer1:8761
-      - EUREKASERVICE_URI_2=http://eurekapeer2:8761
-      - EUREKASERVICE_PORT=8761
-      - CONFIGSERVICE_URI=http://configservice:8888
-      - AUTHSERVICE_URI=http://authservice:9999
-      - ZUULSERVICE_URI=http://zuulservice:5555
-      - SAMPLESERVICE_URI=http://sampleservice:8090
-      - ENCRYPT_KEY="COMMON_SYMMETRIC_KEY"
-      - GRADLE_OPTS=-Xmx512m
+      EUREKASERVICE_URI_1: http://eurekapeer1:8761
+      EUREKASERVICE_URI_2: http://eurekapeer2:8761
+      EUREKASERVICE_PORT: 8761
+      CONFIGSERVICE_URI: http://configservice:8888
+      AUTHSERVICE_URI: http://authservice:9999
+      ZUULSERVICE_URI: http://zuulservice:5555
+      SAMPLESERVICE_URI: http://sampleservice:8090
+      ENCRYPT_KEY: "COMMON_SYMMETRIC_KEY"
+      JAVA_OPTS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
     working_dir: /appsrc
     command: bash -c "ping -c 1 eurekapeer1 && ping -c 1 eurekapeer2 && ping -c 1 configservice && ping -c 1 sampleservice && ping -c 1 authservice && ping -c 1 zuulservice && ./gradlew integTest --no-daemon"

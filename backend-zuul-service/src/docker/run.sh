@@ -11,7 +11,10 @@ echo "--> Cloud Config service has started"
 # TODO wait for zipkin
 
 echo "-> Starting Zuul service (services gateway)"
-java    -Djava.security.egd=file:/dev/./urandom \
+java    -XX:+PrintFlagsFinal \
+        -XX:+UnlockExperimentalVMOptions \
+        -XX:+UseCGroupMemoryLimitForHeap \
+        -Djava.security.egd=file:/dev/./urandom \
         -Dserver.port=$SERVER_PORT \
         -Deureka.client.serviceUrl.defaultZone=$EUREKASERVICE_URI \
         -Dspring.cloud.config.uri=$CONFIGSERVICE_URI \
